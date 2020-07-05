@@ -21,9 +21,9 @@ public:
     void onCommand(uint8_t senderId, const Command *command) override;
 
 
-    void onSet(uint8_t senderId, const uint8_t params[24]);
-    void onGet(uint8_t senderId, const uint8_t params[24]);
-    void onState(uint8_t senderId, const uint8_t params[24]);
+    virtual void onSet(uint8_t senderId, const uint8_t params[24]);
+    virtual void onGet(uint8_t senderId, const uint8_t params[24]);
+    virtual void onState(uint8_t senderId, const uint8_t params[24]);
 };
 
 
