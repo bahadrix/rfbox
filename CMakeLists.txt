@@ -20,7 +20,6 @@ set(${PROJECT_NAME}_SRCS
         commander.cpp
         systemcommander.cpp
         basiccommander.cpp
-        rfbox.cpp
         rfbox_test.cpp)
 set(${PROJECT_NAME}_HDRS
         util.h
@@ -30,7 +29,7 @@ set(${PROJECT_NAME}_HDRS
         systemcommander.h
         basiccommander.h
         lib/ArduinoCore-avr/libraries/EEPROM/src/EEPROM.h
-        rfbox.h)
+        )
 
 ### Additional static libraries to include in the target.
 # set(${PROJECT_NAME}_LIBS)
