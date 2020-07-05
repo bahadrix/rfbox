@@ -16,7 +16,7 @@ void Commander::send(uint8_t target, uint8_t commandIndex, const uint8_t *params
     static uint8_t pos, i;
     pos = 0;
     cmdWithPrefixes[pos++] = this->domainIndex;
-    cmdWithPrefixes[pos++] = this->domainIndex;
+    cmdWithPrefixes[pos++] = this->setIndex;
     cmdWithPrefixes[pos++] = commandIndex;
 
     for (i = 0; i < size; i++) {

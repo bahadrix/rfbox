@@ -6,7 +6,6 @@
 #include "broker.h"
 
 
-
 void SystemCommander::onCommand(uint8_t senderId, const Command *command) {
 
     switch (command->index) {
