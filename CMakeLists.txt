@@ -18,16 +18,12 @@ set(${PROJECT_NAME}_SRCS
         broker.cpp
         serialcontroller.cpp
         commander.cpp
-        systemcommander.cpp
-        basiccommander.cpp
         rfbox_test.cpp)
 set(${PROJECT_NAME}_HDRS
         util.h
         commander.h
         broker.h
         serialcontroller.h
-        systemcommander.h
-        basiccommander.h
         lib/ArduinoCore-avr/libraries/EEPROM/src/EEPROM.h
         )
 

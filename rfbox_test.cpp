@@ -51,10 +51,7 @@ void setup() {
 
     systemCommander = new SystemCommander(broker);
 
-    broker->setCommanders({
-                                  (Commander **) &systemCommander
-                          });
-
+    broker->setCommander(systemCommander);
 
     serialController = new SerialController(&Serial);
 

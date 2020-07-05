@@ -21,16 +21,13 @@ private:
     uint8_t deviceId;
     RF24 *radio{};
     uint8_t buffer[MAX_PACKAGE_SIZE] = {0};
-    Commander **commanders;
-    uint8_t commandersLength;
-
-
+    Commander *commander;
 public:
     Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio);
 
-    void setCommanders(Commander **commanders, uint8_t size);
+    void setCommander(Commander *commander);
 
-    bool send(uint8_t target, const char *payload, uint8_t payloadSize);
+    bool send(uint8_t receiver, const char *payload, uint8_t payloadSize);
 
     void listen();
 

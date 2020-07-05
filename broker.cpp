@@ -3,20 +3,19 @@
 //
 
 #include "broker.h"
-#include "systemcommander.h"
 #include "util.h"
+#include "commander.h"
 
 Broker::Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio) : poolId(poolId), deviceId(deviceId) {
     this->radio = radio;
-    this->commandersLength = 1;
 }
 
-bool Broker::send(uint8_t target, const char *payload, uint8_t payloadSize) {
+bool Broker::send(uint8_t receiver, const char *payload, uint8_t payloadSize) {
     radio->stopListening();
     this->radio->openWritingPipe(this->poolId);
 
     uint8_t pos = 0;
-    this->buffer[pos++] = target;
+    this->buffer[pos++] = receiver;
     this->buffer[pos++] = this->deviceId;
     this->buffer[pos++] = payloadSize;
 
@@ -43,7 +42,7 @@ void Broker::listen() {
     radio->read(&buffer, MAX_PACKAGE_SIZE);
 
     /*
-    Serial.print("Message: ");
+    Serial.print("Messageo: ");
     Util::print_u8(buffer, MAX_PACKAGE_SIZE);
     Serial.println("");
     */
@@ -70,22 +69,11 @@ void Broker::listen() {
 
     //printf("CMD Info: D: %d S: %d I: %d\n", command.domainIndex, command.setIndex, command.index);
 
-    // We've got the message. Now check for corresponding commander
-
-    static uint8_t ci; // commander iterator
-    static Commander *commander;
-
-    for (ci = 0; ci < this->commandersLength; ci++) { // Searching with O(n).
-        commander = this->commanders[ci];
-        if (commander->domainIndex == command.domainIndex && commander->setIndex == command.setIndex) {
-            commander->onCommand(senderId, &command);
-        }
-    }
+    commander->onCommand(senderId, &command);
 }
 
-void Broker::setCommanders(Commander **commanders, uint8_t size) {
-    this->commanders = commanders;
-    this->commandersLength = size;
+void Broker::setCommander(Commander *commander) {
+    this->commander = commander;
 }
 
 
