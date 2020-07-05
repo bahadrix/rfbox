@@ -83,8 +83,9 @@ void Broker::listen() {
     }
 }
 
-void Broker::setCommanders(Commander **commanders) {
-    Broker::commanders = commanders;
+void Broker::setCommanders(Commander **commanders, uint8_t size) {
+    this->commanders = commanders;
+    this->commandersLength = size;
 }
 
 
