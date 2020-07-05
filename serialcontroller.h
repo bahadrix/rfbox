@@ -10,12 +10,18 @@
 #include <stdint.h>
 #include <HardwareSerial.h>
 
+enum SCState {WAIT, READ_LENGTH, READ_MESSAGE};
+
 class SerialController {
+    const int COMMAND_STARTER = 64; // @ symbol
     char *buffer;
+    uint8_t currentPayloadSize = 0;
     HardwareSerial *serial;
     uint8_t pos;
     bool clear;
+    SCState state;
 public:
+
     explicit SerialController(HardwareSerial *serial);
 
     uint8_t listen(char **message);

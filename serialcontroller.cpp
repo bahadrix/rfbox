@@ -8,28 +8,37 @@ SerialController::SerialController(HardwareSerial *serial) : serial(serial) {
     this->buffer = new char [UINT8_MAX];
     this->pos = 0;
     this->clear = false;
+    this->state = SCState::WAIT;
 }
 
 uint8_t SerialController::listen(char **message) {
 
-    if (Serial.available()) {
-        if (this->clear) {
-            this->pos = 0;
-            this->clear = false;
-        }
-        int ch = Serial.read();
-
-
-        if (ch == 10 || this->pos == UINT8_MAX) {
-            this->clear = true;
-            *message = this->buffer;
-            return this->pos;
-        }
-
-        this->buffer[this->pos++] = ch;
+    if (!Serial.available()) {
+        return 0;
     }
 
+    uint8_t c = Serial.read();
 
+    switch (this->state) {
+        case SCState::WAIT:
+            if (c == COMMAND_STARTER) {
+                this->state = SCState::READ_LENGTH;
+                this->pos = 0;
+            }
+            break;
+        case SCState::READ_LENGTH:
+            this->currentPayloadSize = c - 1; // -1 for current byte
+            this->state = SCState::READ_MESSAGE;
+            break;
+        case SCState::READ_MESSAGE:
+            if (pos < this->currentPayloadSize) {
+                this->buffer[pos++] = c;
+            } else {
+                this->state = SCState::WAIT;
+                *message = this->buffer;
+                return pos;
+            }
+    }
 
     return 0;
 }

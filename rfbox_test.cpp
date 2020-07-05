@@ -46,7 +46,7 @@ void setup() {
     radio->enableDynamicPayloads();
     radio->powerUp();
 
-    broker = new Broker(POOL_ID, deviceID, radio);
+    broker = new Broker(POOL_ID, deviceID, radio, false);
 
 
 
