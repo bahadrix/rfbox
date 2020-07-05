@@ -4,7 +4,6 @@
 #include "broker.h"
 #include "serialcontroller.h"
 #include <printf.h>
-#include "systemcommander.h"
 
 #define EEPROM_DEVICE_ID_SLOT 11
 const uint64_t POOL_ID = 0x4241484158LL;
@@ -14,7 +13,7 @@ const int PIN_MASTER = 2;
 
 Broker *broker;
 SerialController *serialController;
-SystemCommander *systemCommander;
+Commander *commander;
 char *serialMessage;
 
 uint8_t deviceID; // will be read from eeprom
@@ -49,9 +48,10 @@ void setup() {
 
     broker = new Broker(POOL_ID, deviceID, radio);
 
-    systemCommander = new SystemCommander(broker);
 
-    broker->setCommander(systemCommander);
+
+    broker->setCommander(commander);
+
 
     serialController = new SerialController(&Serial);
 
@@ -80,8 +80,10 @@ void testLoop() {
 
     if (isMaster()) {
         if (millis() % 2000 == 0) {
-            Serial.println("Ping to 30");
-            systemCommander->sendPing(30);
+            //Serial.println("Ping to 30");
+            //systemCommander->sendPing(30);
+
+
 
         }
     }
