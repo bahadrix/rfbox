@@ -7,10 +7,21 @@
 
 
 
-class serialcontroller {
+#include <stdint.h>
+#include <HardwareSerial.h>
+
+class SerialController {
+    char *buffer;
+    HardwareSerial *serial;
+    uint8_t pos;
+    bool clear;
+public:
+    explicit SerialController(HardwareSerial *serial);
+
+    uint8_t listen(char **message);
+
 
 };
-
 
 
 #endif //RFBOX_SERIALCONTROLLER_H

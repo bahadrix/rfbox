@@ -7,9 +7,30 @@ set(${PROJECT_NAME}_BOARD nano)
 set(ARDUINO_CPU atmega328)
 project(${PROJECT_NAME})
 
+include_directories(lib/ArduinoCore-avr/libraries/SPI/src)
+include_directories(lib/RF24)
+include_directories(lib/ArduinoCore-avr/libraries/EEPROM/src)
 # Define additional source and header files or default arduino sketch files
-set(${PROJECT_NAME}_SRCS rfbox.cpp rfbox_test.cpp)
-set(${PROJECT_NAME}_HDRS rfbox.h)
+set(${PROJECT_NAME}_SRCS
+        util.cpp
+        lib/ArduinoCore-avr/libraries/SPI/src/SPI.cpp
+        lib/RF24/RF24.cpp
+        broker.cpp
+        serialcontroller.cpp
+        commander.cpp
+        systemcommander.cpp
+        basiccommander.cpp
+        rfbox.cpp
+        rfbox_test.cpp)
+set(${PROJECT_NAME}_HDRS
+        util.h
+        commander.h
+        broker.h
+        serialcontroller.h
+        systemcommander.h
+        basiccommander.h
+        lib/ArduinoCore-avr/libraries/EEPROM/src/EEPROM.h
+        rfbox.h)
 
 ### Additional static libraries to include in the target.
 # set(${PROJECT_NAME}_LIBS)

@@ -2,10 +2,13 @@
 // Created by Bahadir Katipoglu on 1.07.2020.
 //
 
-#include "pool.h"
+#include "broker.h"
+#include "systemcommander.h"
+#include "util.h"
 
 Broker::Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio) : poolId(poolId), deviceId(deviceId) {
     this->radio = radio;
+    this->commandersLength = 1;
 }
 
 bool Broker::send(uint8_t target, const char *payload, uint8_t payloadSize) {
@@ -20,56 +23,71 @@ bool Broker::send(uint8_t target, const char *payload, uint8_t payloadSize) {
     for (uint8_t i = 0; i < payloadSize && pos < MAX_PACKAGE_SIZE; i++) {
         this->buffer[pos++] = *(payload + i);
     }
-    printf("Sending message size of %d to pool of %x", pos, this->poolId);
+    //printf("Sending message size of %d to broker of %x\n", pos, this->poolId);
     return this->radio->write(this->buffer, pos);
 }
 
-uint8_t Broker::listen(uint8_t *message, uint8_t *senderId) {
+void Broker::listen() {
+
+    static const uint8_t payloadPrefixCount = 3;
 
     this->radio->startListening();
     this->radio->openReadingPipe(1, this->poolId);
 
-    if (!radio->available()) {
-        return 0;
+    if (!radio->available()) { // Wait for message
+        return;
     }
 
-    //radio->read(&this->buffer, sizeof(this->buffer));
+
     static uint8_t buffer[MAX_PACKAGE_SIZE] = {0};
     radio->read(&buffer, MAX_PACKAGE_SIZE);
 
-    //printf("%d, %d\n", buffer[0], buffer[1]);
+    /*
+    Serial.print("Message: ");
+    Util::print_u8(buffer, MAX_PACKAGE_SIZE);
+    Serial.println("");
+    */
 
-    //printf("DID %d\n", this->deviceId);
-
-    //uint8_t deviceId = buffer[0];
-    //uint8_t thisDeviceId = this->deviceId;
-    //if (this->buffer[0] != this->deviceId) {
-    //printf("Message device: %d, this device: %d\n", deviceId, thisDeviceId);
-    if (buffer[0] != this->deviceId) {
-        // this message is not for me
-        Serial.println("Not for me");
-        return 0;
+    if (buffer[0] != this->deviceId && buffer[0] != Commander::EVERYONE) {
+        // this message is not for us
+        return;
     }
 
+    // Message sent to us, lets process it
+    static uint8_t pos, payloadSize, senderId;
+    pos = 1; // Reset position
+    senderId = buffer[pos++];
+    payloadSize = buffer[pos++];
 
-    uint8_t pos = 1;
+    static Command command = {
+            .domainIndex=0,
+            .setIndex=0,
+            .index=0,
+            .params={0},
+    };
 
-    *senderId = buffer[pos++];
+    Commander::parseCommand(buffer + pos, payloadSize, &command);
 
-    uint8_t payloadSize = buffer[pos++];
+    //printf("CMD Info: D: %d S: %d I: %d\n", command.domainIndex, command.setIndex, command.index);
 
-    if (payloadSize == 0) {
-        // the message is for me but it's empty
-        return 0;
+    // We've got the message. Now check for corresponding commander
+
+    static uint8_t ci; // commander iterator
+    static Commander *commander;
+
+    for (ci = 0; ci < this->commandersLength; ci++) { // Searching with O(n).
+        commander = this->commanders[ci];
+        if (commander->domainIndex == command.domainIndex && commander->setIndex == command.setIndex) {
+            commander->onCommand(senderId, &command);
+        }
     }
-
-    uint8_t i;
-
-    for (i = 0; i < payloadSize; i++) {
-        message[i] = buffer[pos++];
-    }
-
-    return i;
 }
+
+void Broker::setCommanders(Commander **commanders) {
+    Broker::commanders = commanders;
+}
+
+
+
 
 
