@@ -27,8 +27,7 @@ uint8_t SerialController::listen(char **message) {
             }
             break;
         case SCState::READ_LENGTH:
-            this->currentPayloadSize = c; // -1 for current byte
-
+            this->currentPayloadSize = c;
             this->state = SCState::READ_MESSAGE;
             break;
         case SCState::READ_MESSAGE:
