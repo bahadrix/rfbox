@@ -60,6 +60,25 @@ void Commander::parseCommand(const uint8_t *payload, uint8_t size, Command *comm
 }
 
 void Commander::onCommand(uint8_t senderId, const Command *command) {
+
+    if (command->domainIndex != this->domainIndex || command->setIndex != this->setIndex) {
+        // this command is not for our domain or command set
+        return;
+    }
+
+    if (copyToSerial) {
+        Serial.write('@');
+        Serial.write(senderId);
+        Serial.write(command->domainIndex);
+        Serial.write(command->setIndex);
+        Serial.write(command->index);
+        for (unsigned char param : command->params) {
+            Serial.write(param);
+        }
+        Serial.write("\n");
+    }
+
+
     switch (command->index) {
         case CI_PING: // Ping received
             sendPong(senderId);
@@ -100,7 +119,7 @@ void Commander::callToRoll() {
 
 void Commander::onPong(uint8_t senderId, const uint8_t *params) {
     volatile auto lifetime = (unsigned long *) params;
-    printf("Pong from %d LT: %lu\n", senderId, *lifetime);
+    //printf("Pong from %d LT: %lu\n", senderId, *lifetime);
 }
 
 void Commander::sendState(uint8_t receiver, uint8_t target, const uint8_t *values, uint8_t valuesSize) {
@@ -119,6 +138,13 @@ void Commander::sendState(uint8_t receiver, uint8_t target, const uint8_t *value
 
 void Commander::sendState(uint8_t receiver, uint8_t target, const uint8_t *values) {
     this->sendState(receiver, target, values, 1);
+}
+
+uint8_t Commander::commandBytes(Command *command, uint8_t *commandBytes) {
+
+
+
+    return 0;
 }
 
 

@@ -14,6 +14,7 @@ struct Command {
     uint8_t setIndex{};
     uint8_t index{};
     uint8_t params[MAX_PARAMS_SIZE] = {0};
+
 };
 
 
@@ -23,7 +24,7 @@ struct Command {
 class Commander {
 private:
     void sendPong(uint8_t target);
-
+    bool copyToSerial = false; // copy received messages to terminal
 protected:
     Broker *broker;
 
@@ -45,8 +46,9 @@ public:
     uint8_t domainIndex;
     uint8_t setIndex;
 
-    Commander(Broker *broker, uint8_t domainIndex, uint8_t setIndex) : broker(broker), domainIndex(domainIndex),
-                                                                       setIndex(setIndex) {}
+    Commander(Broker *broker, uint8_t domainIndex, uint8_t setIndex, bool copyToSerial)
+            : broker(broker), domainIndex(domainIndex),
+              setIndex(setIndex), copyToSerial(copyToSerial) {}
     void callToRoll();
     void sendPing(uint8_t receiver);
     void sendState(uint8_t receiver, uint8_t target, const uint8_t *values, uint8_t valuesSize);
@@ -56,6 +58,8 @@ public:
     void send(uint8_t receiver, uint8_t commandIndex);
 
     static void parseCommand(const uint8_t *payload, uint8_t size, Command *command);
+    static uint8_t commandBytes(Command *command, uint8_t *commandBytes);
+
 
     virtual void onCommand(uint8_t senderId, const Command *command);
 

@@ -22,9 +22,8 @@ private:
     RF24 *radio{};
     uint8_t buffer[MAX_PACKAGE_SIZE] = {0};
     Commander *commander;
-    bool copyToSerial;
 public:
-    Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio, bool copyToSerial);
+    Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio);
 
     void setCommander(Commander *commander);
 

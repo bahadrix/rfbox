@@ -6,8 +6,8 @@
 #include "util.h"
 #include "commander.h"
 
-Broker::Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio, bool copyToSerial = false)
-        : poolId(poolId), deviceId(deviceId), copyToSerial(copyToSerial) {
+Broker::Broker(uint64_t poolId, uint8_t deviceId, RF24 *radio)
+        : poolId(poolId), deviceId(deviceId) {
     this->radio = radio;
 }
 
@@ -53,6 +53,8 @@ void Broker::listen() {
         return;
     }
 
+    // ** Message format: { receiver, sender, payloadSize, payload { domainIndex, setIndex, commandIndex, params } }
+
     // Message sent to us, lets process it
     static uint8_t pos, payloadSize, senderId;
     pos = 1; // Reset position
@@ -68,17 +70,11 @@ void Broker::listen() {
 
     Commander::parseCommand(buffer + pos, payloadSize, &command);
 
+
     //printf("CMD Info: D: %d S: %d I: %d\n", command.domainIndex, command.setIndex, command.index);
 
     commander->onCommand(senderId, &command);
 
-    if (copyToSerial) {
-        Serial.write('@');
-        for (unsigned char i : buffer) {
-            Serial.write(i);
-        }
-        Serial.write("\n");
-    }
 }
 
 void Broker::setCommander(Commander *commander) {
